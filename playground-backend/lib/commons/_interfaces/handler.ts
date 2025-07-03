@@ -29,10 +29,6 @@ interface SuccessBodyInterface {
   data: JSON
 }
 
-interface MayaSessionSuccessBodyInterface {
-  sessionId: string
-}
-
 interface SuccessResponseInterface {
   headers?: {
     'Content-Type': string
@@ -75,7 +71,6 @@ export {
   SqsLambdaInterface,
   MiddyInterface,
   SuccessBodyInterface,
-  MayaSessionSuccessBodyInterface,
   SuccessResponseInterface,
   ExceptionInterface,
   ErrorResponseInterface,

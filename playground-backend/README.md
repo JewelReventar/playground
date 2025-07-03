@@ -80,7 +80,7 @@ Example path: **services/user-service/serverless.yml**
 
 This is where the core logic of each service lives.
 
-#### 📂 `app/controller/`
+#### 📂 `app/controller/` - Lambda Business Logic Layer
 
 - Business logic layer.
 - One controller per domain entity or feature.

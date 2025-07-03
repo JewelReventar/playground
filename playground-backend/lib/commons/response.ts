@@ -3,7 +3,6 @@ import {
   ErrorResponseInterface,
   SuccessResponseInterface,
   SuccessBodyInterface,
-  MayaSessionSuccessBodyInterface,
 } from '@lib/commons/_interfaces/handler'
 
 const defaultHeaders = {
@@ -12,7 +11,7 @@ const defaultHeaders = {
 }
 
 export const successResponse = (
-  payload: SuccessBodyInterface | MayaSessionSuccessBodyInterface,
+  payload: SuccessBodyInterface,
   type: 'invocation' | 'https' | 'event' = 'https',
 ): SuccessResponseInterface => {
   const response: SuccessResponseInterface = {
