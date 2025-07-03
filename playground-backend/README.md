@@ -80,14 +80,14 @@ Example path: **services/user-service/serverless.yml**
 
 This is where the core logic of each service lives.
 
-#### 📂 `app/controller/` - Lambda Business Logic Layer
+#### 📂 `app/handlers/` - Lambda Business Logic Layer
 
 - Business logic layer.
 - One controller per domain entity or feature.
 
 Example path: **app/controller/UserController.ts**
 
-### 📂 `app/handlers/` – Lambda Routing Layer
+#### 📂 `app/handlers/` – Lambda Routing Layer
 
 This directory contains all Lambda function entry points. It acts as the **routing layer**, connecting incoming events (HTTP, SQS, Cron) to controller methods.
 
