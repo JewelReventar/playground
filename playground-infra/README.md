@@ -119,6 +119,38 @@ Follow the steps below to deploy infrastructure to a specific environment using 
 
 ### 1. Navigate to the target environment
 
+_If you create a new environment e.g. sandbox make sure it contains `main.tf` and `variables.tf` file_
+
+```
+environments/
+├── sandbox/
+│   ├── main.tf
+│   └── variables.tf
+```
+
+To properly define your target region, profile etc... adjust the `variables.tf`
+
+```
+variable "project_name" {
+  type    = string
+  default = "{your-project-name}"
+}
+variable "aws_profile" {
+  type    = string
+  default = "{your-aws-profile}"
+}
+variable "environment" {
+  type    = string
+  default = "{your-environment}"
+}
+variable "region" {
+  type    = string
+  default = "{your-aws-region}"
+}
+```
+
+### 2. Deployment Steps
+
 ```bash
 cd environments/<env>  # Example: cd environments/dev
 
@@ -130,7 +162,3 @@ terraform apply # Provisions defined modules
 
 terraform destroy # Run this if you wish to deprovision your services
 ```
-
-
-
-
