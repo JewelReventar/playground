@@ -1,0 +1,15 @@
+# "org" ensures this Service is used with the correct Serverless Framework Access Key.
+org: jewelreventar
+
+stages:
+  default:
+    params:
+      project: playground
+      org: ${self:org}
+      environment: ${opt:stage, 'dev'}
+      region: ${opt:region, 'ap-southeast-1'}
+      ssmPrefix: ${param:project}/${param:environment}
+
+services:
+  user-service:
+    path: services/user-service

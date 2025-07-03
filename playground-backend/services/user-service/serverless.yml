@@ -1,0 +1,131 @@
+# "org" ensures this Service is used with the correct Serverless Framework Access Key.
+org: ${param:org}
+
+custom:
+  version: 1.0.0
+  service: ${param:project}-user-service
+  environmentMapping:
+    sandbox: sandbox
+    dev: dev
+    staging: staging
+    beta: prod
+    prod: prod
+
+# AWS Lambda prefix function name
+service: ${self:custom.service}
+
+# "app" enables Serverless Framework Dashboard features and sharing them with other Services.
+configValidationMode: error
+
+package:
+  excludeDevDependencies: true
+  patterns:
+    - '!node_modules/**'
+    - '!layers/**'
+    - '!test/**'
+    - '!.gitignore'
+    - '!.prettierrc'
+    - '!package.json'
+    - '!package-lock.json'
+    - '!project.config.yml'
+    - '!jest.config.js'
+    - '!coverage/**'
+
+build:
+  esbuild:
+    # Enable or Disable bundling the function code and dependencies. (Default: true)
+    bundle: true
+    # Enable minifying function code. (Default: false)
+    minify: false
+    # NPM packages to not be bundled
+    # If this is set then all dependencies will be treated as external and not bundled.
+    packages: external
+    # Enable or configure sourcemaps, can be set to true or to an object with further configuration.
+    sourcemap:
+      # The sourcemap type to use, options are (inline, linked, or external)
+      type: linked
+      # Whether to set the NODE_OPTIONS on functions to enable sourcemaps on Lambda
+      setNodeOptions: true
+
+provider:
+  name: aws
+  deploymentMethod: direct
+  region: ${param:region}
+  stage: ${param:environment}
+  logRetentionInDays: 180
+  memorySize: 256
+  timeout: 29
+  runtime: nodejs20.x
+  versionFunctions: false
+  # Attach defined layers here
+  layers:
+    # AWS Lambda Powertool Layer
+    - arn:aws:lambda:${param:region}:094274105915:layer:AWSLambdaPowertoolsTypeScriptV2:22
+  # vpc:
+  #   securityGroupIds:
+  #     - ${ssm:/${param:ssmPrefix}/lambda/sg}
+  #   subnetIds:
+  #     - ${ssm:/${param:ssmPrefix}/private/subnet/1}
+  #     - ${ssm:/${param:ssmPrefix}/private/subnet/2}
+
+  iam:
+    role: ${ssm:/${param:ssmPrefix}/lambda/role/arn}
+  stackTags:
+    project: ${param:project}
+    service: ${self:custom.service}-${self:custom.version, '1'}
+  tracing:
+    lambda: true
+  environment:
+    PROJECT_NAME: ${param:project}
+    SERVICE_NAME: ${self:custom.service}
+    ENVIRONMENT: ${param:environment}
+    SQS_MAIN_QUEUE_URL: ${ssm:/${param:ssmPrefix}/sqs/main-queue/url}
+    HOOKBIN_BASE_URL: ${ssm:/${param:ssmPrefix}/hookbin/base-url}
+    # DEFINE USABLE SSM RESOURCES HERE
+
+functions:
+  CreateUser:
+    handler: app/handlers/http/user/create.handler
+    events:
+      - http:
+          path: /user
+          method: post
+          cors: true
+
+  DeleteUser:
+    handler: app/handlers/http/user/delete.handler
+    events:
+      - http:
+          path: /user/{id}
+          method: delete
+          cors: true
+
+  UpdateUser:
+    handler: app/handlers/http/user/update.handler
+    events:
+      - http:
+          path: /user/{id}
+          method: put
+          cors: true
+
+  InitiateHappyBirthday:
+    handler: app/handlers/http/user/initiateHappyBirthday.handler
+    events:
+      - http:
+          path: /user/initiate-happy-birthday
+          method: post
+          cors: true
+
+  ScheduledInitiateHappyBirthday:
+    handler: app/handlers/cron/initiateHappyBirthday.handler
+    events:
+      - schedule:
+          rate: rate(1 hour)
+          enabled: false
+
+  MainQueueConsumer:
+    handler: app/handlers/queue/main-queue.handler
+    events:
+      - sqs:
+          arn: ${ssm:/${param:ssmPrefix}/sqs/main-queue/arn}
+          batchSize: 5
